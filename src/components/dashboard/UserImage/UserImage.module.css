@@ -1,0 +1,13 @@
+.UserImage{
+    margin-top:10px ;
+    margin-bottom:10px ;
+}
+.FakeImage{
+    margin-top:10px ;
+    margin-bottom:10px ;
+}
+
+.FakeImage img{
+    max-width:200px;
+    max-height: 150px;
+}
