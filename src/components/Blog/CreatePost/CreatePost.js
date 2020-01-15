@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 import { validateAll } from 'indicative/validator';
-import { Message,Button } from 'semantic-ui-react'
+import { Message } from 'semantic-ui-react';
+import {createPostRules, validationMsg} from '../../../utils/validation/schema';
 
 class CreatePost extends Component{
     constructor(props){
@@ -52,22 +53,8 @@ class CreatePost extends Component{
     handleSubmit = e=>{
         e.preventDefault();
         this.setState({formSubmit:true})
-        const rules  = {
-            title:'required|max:50',
-            description:'required|max:5000',
-        };
 
-        const messages = {
-            required: (field, validation, args) =>{
-                field = field.split('_').join(' ');
-                return `${field} is required!`;
-            },
-            max: (field, validation, args) =>{
-                return `${field} should be greater than ${args} characters`;
-            },
-        }
-
-        validateAll(this.state.form,rules,messages)
+        validateAll(this.state.form,createPostRules,validationMsg)
             .then(()=>{
                 this.setState({ errors:{}});
                 let form = {...this.state.form}

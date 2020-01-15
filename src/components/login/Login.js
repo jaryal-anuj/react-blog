@@ -7,7 +7,8 @@ import { Message,Button } from 'semantic-ui-react';
 
 import GoogleLogin from 'react-google-login';
 import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props'
-
+import {signinRules, validationMsg} from '../../utils/validation/schema';
+import { AuthContext } from '../../context/auth';
 
 class Login extends Component{
     constructor(props){
@@ -22,52 +23,33 @@ class Login extends Component{
                 text:''
             },
             formSubmit:false,
+            tokens:{
+
+            }
         };
     }
-
+    static contextType = AuthContext;
     handleSubmit = (event)=>{
         event.preventDefault();
         this.setState({formSubmit:true})
-        const rules  = {
-            email:'required|email',
-            password:'required|min:6|max:20',
 
-        };
-
-        const messages = {
-            required: (field, validation, args) =>{
-                field = field.split('_').join(' ');
-                return `${field} is required!`;
-            },
-            email: (field, validation, args) =>{
-                return `${field} is not valid`;
-            },
-            min: (field, validation, args) =>{
-                return `${field} should be more than ${args} characters`;
-            },
-            max: (field, validation, args) =>{
-                return `${field} should be greater than ${args} characters`;
-            },
-            confirmed:(field, validation, args) =>{
-                return `Confirm password should match the password`;
-            }
-        }
-
-        validateAll(this.state.form,rules,messages)
+        validateAll(this.state.form,signinRules,validationMsg)
             .then(()=>{
                 this.setState({ errors:{}});
                 let data = {...this.state.form};
                 axios.post("/auth/login",data)
                 .then((res)=>{
-                    console.log(res);
                    let form = {...this.state.form}
                    for (let key in form) {
                        if (form.hasOwnProperty(key)) {
                            form[key] = '';
                        }
                    }
+
+                   localStorage.setItem('tokens',JSON.stringify(res.data));
                    this.setState({
                        form,
+                       tokens:res.data,
                        formSubmit:false,
                        message:{
                             type:'positive',
@@ -126,14 +108,57 @@ class Login extends Component{
     }
 
     responseFacebook = (res)=>{
-        console.log(res);
+        if(res.id){
+
+            let data = {fb_id:res.id};
+            axios.post('/auth/fb_login',data)
+                .then(res=>{
+                    this.setState({
+                        message:{
+                            type:'positive',
+                            msg:"Login successfully!",
+                        }
+                    });
+                })
+                .catch(err=>{
+                    this.setState({
+                        message:{
+                            type:'negtive',
+                            msg:err.response.data.message,
+                        }
+                    });
+                })
+        }
     }
 
     responseGoogle = (res)=>{
-        console.log(res);
+        if(res.profileObj){
+
+            let data = {gmail_id:res.profileObj.googleId};
+            axios.post('/auth/gmail_login',data)
+                .then(res=>{
+                    this.setState({
+                        message:{
+                            type:'positive',
+                            msg:"Login successfully!",
+                        }
+                    });
+                })
+                .catch(err=>{
+                    console.log(err);
+                    this.setState({
+                        message:{
+                            type:'negtive',
+                            msg:err.response.data.message,
+                        }
+                    });
+                })
+
+        }
     }
     
     render(){
+        
         return(
             <div className="card bg-light">
                 <article className="card-body mx-auto" style={{maxWidth: 400,marginTop:100,"height":"100vh"}}>

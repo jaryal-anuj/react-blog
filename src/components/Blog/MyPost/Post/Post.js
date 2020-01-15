@@ -10,7 +10,6 @@ class Post extends Component{
 
 
     render(){
-
         return(
             <div className="row shadow" style={{marginBottom:'20px',padding:10,minHeight:200}}>
                 <div className="col-sm-12 text-right">
@@ -25,7 +24,7 @@ class Post extends Component{
                 <div className="col-sm-8">
                     <h5><span className="fa fa-clock-o"></span> Post by {this.props.user_name}, {moment(this.props.created_at).format('MMMM Do YYYY, h:mm:ss a')}.</h5>
                     <h5><span className="badge badge-danger">Lorem</span></h5><br></br>
-                    <h2><Link to={`/post/${this.props.id}`} >{this.props.title}</Link></h2>
+                    <h2><Link to={`/post/show/${this.props.id}`} >{this.props.title}</Link></h2>
                     <p style={{ "whiteSpace":"pre-line" }}>{this.props.body.slice(0,300)}</p>
                 </div>
             </div>

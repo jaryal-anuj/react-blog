@@ -3,16 +3,18 @@ import Post from './Post/Post';
 import axios from 'axios';
 import { Pagination } from 'semantic-ui-react';
 import Search from '../Blog/Search/Search';
+import { AuthContext } from '../../context/auth';
+
 
 
 class Blog extends Component {
-
+  
     state={
         posts:[],
         post_meta:{},
         search:''
     }
-    
+    static contextType = AuthContext;
     componentDidMount(){
         axios.get('/post').then(response =>{
            // console.log(response.data);
@@ -58,15 +60,15 @@ class Blog extends Component {
     }
     
     render(){
+        console.log('class', this.context.Provider);
         const posts = this.state.posts;
-        
-       // console.log(posts);
+ 
         let renderPost = [];
         if(posts.length) {
             renderPost =posts.map((post,index)=>{
 
                 let file = post.post_image[0] ? post.post_image[0].file: null;
-                console.log(file);
+
                 return <Post  
                             id={post.id}
                             key={index} 

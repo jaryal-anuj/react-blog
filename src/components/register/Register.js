@@ -5,7 +5,8 @@ import { validateAll } from 'indicative/validator';
 import { Message,Button } from 'semantic-ui-react';
 
 import GoogleLogin from 'react-google-login';
-import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props'
+import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props';
+import {registerRules, validationMsg} from '../../utils/validation/schema';
 
 
 class Register extends Component{
@@ -16,7 +17,9 @@ class Register extends Component{
                 name:'',
                 email:'',
                 password:'',
-                password_confirmation:''
+                password_confirmation:'',
+                gmail_id:'',
+                fb_id:''
             },
             message:{
                 type:'',
@@ -29,33 +32,8 @@ class Register extends Component{
     handleSubmit = (event)=>{
         event.preventDefault();
         this.setState({formSubmit:true})
-        const rules  = {
-            name:'required',
-            email:'required|email',
-            password:'required|min:6|max:20|confirmed',
-            password_confirmation:'required'
-        };
 
-        const messages = {
-            required: (field, validation, args) =>{
-                field = field.split('_').join(' ');
-                return `${field} is required!`;
-            },
-            email: (field, validation, args) =>{
-                return `${field} is not valid`;
-            },
-            min: (field, validation, args) =>{
-                return `${field} should be more than ${args} characters`;
-            },
-            max: (field, validation, args) =>{
-                return `${field} should be greater than ${args} characters`;
-            },
-            confirmed:(field, validation, args) =>{
-                return `Confirm password should match the password`;
-            }
-        }
-
-        validateAll(this.state.form,rules,messages)
+        validateAll(this.state.form,registerRules,validationMsg)
             .then(()=>{
                 this.setState({ errors:{}});
                 let data = {...this.state.form};
@@ -121,6 +99,26 @@ class Register extends Component{
         });
     }
 
+    responseFacebook = (res)=>{
+        if(res.id){
+            let form = {...this.state.form};
+            form.name = res.name;
+            form.email = res.email;
+            form.fb_id = res.id;
+            this.setState({form,message:{type:'positive', msg:"Enter password to register!"}});
+        }
+    }
+
+    responseGoogle = (res)=>{
+        if(res.profileObj){
+            let form = {...this.state.form};
+            form.name = res.profileObj.name;
+            form.email = res.profileObj.email;
+            form.gmail_id = res.profileObj.googleId;
+            this.setState({form,message:{type:'positive', msg:"Enter password to register!"}});
+        }
+    }
+
     render(){
         return(
             <div className="card bg-light">
@@ -138,6 +136,7 @@ class Register extends Component{
                             <button onClick={renderProps.onClick} className="btn btn-block btn-facebook"><i className="fa fa-facebook"></i>&nbsp; Register via facebook</button>
                         )}
                     />
+                    { this.state.errors && this.state.errors.fb_id && <div className="form-error">{this.state.errors.fb_id}</div> }
                     <GoogleLogin
                         clientId="41860437728-hngcsgpdo10qlkotue8f5do5l9ekr6hl.apps.googleusercontent.com" //CLIENTID NOT CREATED YET
                         buttonText="LOGIN WITH GOOGLE"
@@ -147,6 +146,7 @@ class Register extends Component{
                             <button onClick={renderProps.onClick} className="btn btn-block btn-gmail"><i className="fa fa-google-plus"></i>&nbsp; Register via Gmail</button>
                         )}
                     />
+                    { this.state.errors && this.state.errors.gmail_id && <div className="form-error">{this.state.errors.gmail_id}</div> }
                     </p> 
                     <p className="divider-text">
                         <span className="bg-light">OR</span>
