@@ -1,31 +1,32 @@
 import React,{Suspense,lazy} from 'react';
 import { Switch,Route} from 'react-router-dom';
 import './App.css';
-import Home from './components/home/Home';
-//import Dashboard from './components/dashboard/Dashboard';
-//import Login from './components/login/Login';
-//import Register from './components/register/Register';
-import MainLoyout from './components/layout/MainLayout';
-import AuthLayout from './components/layout/AuthLayout';
-import AppRoute from './components/layout/AppRoute';
-import { AuthContext } from "./context/auth";
-
-const Dashboard = lazy(()=>import('./components/dashboard/Dashboard'));
-const Login = lazy(()=>import('./components/login/Login'));
-const Register = lazy(()=>import('./components/register/Register'));
+import Home from 'components/home/Home';
+const Login = lazy(()=>import('containers/Login/Login'));
+const Register = lazy(()=>import('containers/Register/Register'));
+const Blog = lazy(()=>import('containers/Blog/Blog'));
+const CreatePost = lazy(()=>import('containers/CreatePost/CreatePost'));
+const MyPost = lazy(()=>import('containers/MyPost/MyPost'));
+const EditPost = lazy(()=>import('containers/EditPost/EditPost'));
+const FullPost = lazy(()=>import('containers/FullPost/FullPost'));
 
 
 
 
 function App() {
+
 	return (
 		<div className="App">
 				<Suspense fallback={<div>Loading...</div>}>
 					<Switch>
-						<AppRoute layout={AuthLayout} path="/signin" component={Login}/>
-						<AppRoute layout={AuthLayout} path="/signup" component={Register}/>
-						<AppRoute layout={MainLoyout} path="/" exact component={Home}/>
-						<AppRoute layout={MainLoyout} path="/" component={Dashboard}/>
+						<Route path="/signin" component={Login}/>
+						<Route path="/signup" component={Register}/>
+						<Route path="/blog" component={Blog}/>
+						<Route path="/post/edit/:id"  component={EditPost}></Route>
+                        <Route path="/post/show/:id"  component={FullPost}></Route>
+						<Route path="/create-post" component={CreatePost}></Route>
+                        <Route path="/my-posts" component={MyPost}></Route>
+						<Route path="/" exact component={Home}/>
 						<Route render={()=><p>404 Page not found!</p>} />
 					</Switch>
 				</Suspense>
